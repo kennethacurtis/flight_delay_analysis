@@ -11,8 +11,8 @@ The visualizations for the project were created in Tableau. For me to share the 
 * Then [click here](https://www.tableau.com/products/reader) to download the free tableau reader
 * Open Tableau Reader then open the workbook
 
-**To read the report on cleaning this data:**
-[Click here](https://kennethacurtis.github.io/flight_delay_analysis/)
+**To read the report on cleaning this data download and view on your browser:**
+[Click here](https://drive.google.com/open?id=1MQcBIVftU96AEPAtSuSmZvHDlltRalo6)
 
 ### Introduction
 
