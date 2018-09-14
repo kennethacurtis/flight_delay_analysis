@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>Untitled</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>flights_wrangle</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11775,38 +11775,1985 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Flight-Delays-in-the-U.S.-Analysis">Flight Delays in the U.S. Analysis<a class="anchor-link" href="#Flight-Delays-in-the-U.S.-Analysis">&#182;</a></h1><h3 id="View-the-project">View the project<a class="anchor-link" href="#View-the-project">&#182;</a></h3><ul>
-<li>To the view the project, <a href="https://public.tableau.com/profile/kenneth5709#!/vizhome/FlightDelayAnalysis_16/FlightsStory?publish=yes">click here</a></li>
-<li>If you are interested in looking at the gathering and cleaning of this data <a href="https://github.com/kennethacurtis/flight_delay_analysis">click here</a></li>
-<li>The data set is really large, <a href="https://drive.google.com/open?id=1L1jx_CgARXZ1fpgetbvbON9a5AAr19XO">click here to download it</a></li>
-</ul>
-<h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3><p>This data comes from <a href="https://www.transtats.bts.gov">The Bureau of Transportation Statistics</a> and tracks destinations, distance, and delay information of flights across U.S. For this project, I chose the years 2009 through 2017 resulting in 54,383,096 rows of data. To see a more detailed description of the date, click <a href="https://www.transtats.bts.gov/Fields.asp?table_id=236">here</a>.</p>
-<h3 id="Design">Design<a class="anchor-link" href="#Design">&#182;</a></h3><p>When thinking about how I wanted to present the data, I knew in the beginning that I had to make a clear distinction at different types of delays. So I decided on red for departure delays, and blue for arrival delays. This particular design choice had this feedback:</p>
-<p><em>I'd make sure you add that to your key and make sure it's is intuitively clear - usually people associate red with 'bad' but I wasn't quite sure if that's how you were doing it.</em></p>
-<p>After this feedback I changed the color for departure delays to be orange. These colors do not give a destinction of good and bad.</p>
-<p>After getting the colors handled, I wanted to focus on what types of graphs I would be presenting. I wanted to ask questions such as, "what's the relationship between departure and arrival delays? Do they effect each other?", "how can I show an overall understanding of the delays that happen in America while flying?", and "which airports are the most notorious for delays?". In my project you'll see a mixture of scatter plots, maps, bar charts, and tree charts to answer these questions.</p>
-<p>Some other feedback I received was particularly about the calculations done on the map that showed the total amount of delay types in the U.S.:</p>
-<p><em>I find that instead of reporting the default Tableau totals, it's often more meaningful to provide/report the median or mean - it just usually makes more intuitive sense.</em></p>
-<p>After this feedback I changed the maps to show the average of delays instead of totals, the rest of my graphs showed averages after all.</p>
-<h3 id="Further-Exploration">Further Exploration<a class="anchor-link" href="#Further-Exploration">&#182;</a></h3><p>The visualizations for the project were created in Tableau. For me to share the project with others on Tableau Public, the data had to be filtered by just one year, 2017. As you will see in my gathering process, I originally gathered data from 2009 to 2017 which resulted in well over 15 million rows of data, which is the limit for Tableau Public. Because of this I have provided two ways to view the project.</p>
-<p><strong>To view the project for flight data in 2017 on tableau public:</strong> <a href="https://public.tableau.com/profile/kenneth5709#!/vizhome/FlightDelayAnalysis_16/FlightsStory?publish=yes">click here</a></p>
-<p><strong>To view the project for flight data from 2009-2017:</strong></p>
+<h1 id="Gather">Gather<a class="anchor-link" href="#Gather">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h3><p>This data comes from <a href="https://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=">The Bureau of Transportation Statistics</a> and tracks destinations, distance, and delay information of flights across U.S. For this project, I chose the years 2009 through 2017 resulting in 54,383,096 rows of data. To see a more detailed description of the date, click <a href="https://www.transtats.bts.gov/Fields.asp?table_id=236">here</a>.</p>
+<h3 id="Notes">Notes<a class="anchor-link" href="#Notes">&#182;</a></h3><p>Throughout this notebook, you'll notice that most operations are single cell, this was because my machine kept running out of usable memory. The dataset was really large and required as much memory as possible for each operation. You will see multiple cells of code that could possibly be more code efficient, but were lengthened to reduce memory errors. You will also notice that after certain blocks of code, I outputted the dataframe to a csv. Some blocks of code took more than an hour to run. So to save my progress and make sure that I would not waste time re-running previous code, I would output my progress to a csv and then read it back in. I did not include these datasets in the repository, but have kept the code in the notebook.</p>
+<p>The BTS website did not allow users to download full years of data. I downloaded data from the BTS website month by month from 2009 to 2017 and then used <code>pandas</code> to merge the data together. If you are interested in downloading the merged data as well as the cleaned data <a href="https://drive.google.com/open?id=1L1jx_CgARXZ1fpgetbvbON9a5AAr19XO">click here</a>.</p>
+<p>Finally, after the cleaning process I ended up with 53,068,460 rows resulting in keeping 97% of the data. I was also able to bring the memory usage of the dataset from 11.8 GB to 5.7 GB.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.height&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.width&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;month_data&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">combined_csv</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;month_data/&#39;</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_list</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>C:\Users\kster\Anaconda3\lib\site-packages\IPython\core\interactiveshell.py:2850: DtypeWarning: Columns (18) have mixed types. Specify dtype option on import or set low_memory=False.
+  if self.run_code(code, result):
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># change all columns to lowercase</span>
+<span class="n">combined_csv</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">combined_csv</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># reset index</span>
+<span class="n">combined_csv</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combined_csv</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop unnamed column</span>
+<span class="n">combined_csv</span> <span class="o">=</span> <span class="n">combined_csv</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;unnamed: 29&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># output to csv to save memory</span>
+<span class="n">combined_csv</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;combined_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Assess">Assess<a class="anchor-link" href="#Assess">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;combined_df.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>C:\Users\kster\Anaconda3\lib\site-packages\IPython\core\interactiveshell.py:2728: DtypeWarning: Columns (18) have mixed types. Specify dtype option on import or set low_memory=False.
+  interactivity=interactivity, compiler=compiler, result=result)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[4]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>year</th>
+      <th>month</th>
+      <th>day_of_month</th>
+      <th>day_of_week</th>
+      <th>unique_carrier</th>
+      <th>tail_num</th>
+      <th>fl_num</th>
+      <th>origin</th>
+      <th>dest</th>
+      <th>crs_dep_time</th>
+      <th>dep_time</th>
+      <th>dep_delay</th>
+      <th>taxi_out</th>
+      <th>taxi_in</th>
+      <th>crs_arr_time</th>
+      <th>arr_time</th>
+      <th>arr_delay</th>
+      <th>cancelled</th>
+      <th>cancellation_code</th>
+      <th>diverted</th>
+      <th>crs_elapsed_time</th>
+      <th>actual_elapsed_time</th>
+      <th>air_time</th>
+      <th>distance</th>
+      <th>carrier_delay</th>
+      <th>weather_delay</th>
+      <th>nas_delay</th>
+      <th>security_delay</th>
+      <th>late_aircraft_delay</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2009</td>
+      <td>1</td>
+      <td>13</td>
+      <td>2</td>
+      <td>DL</td>
+      <td>N688DL</td>
+      <td>1237</td>
+      <td>ATL</td>
+      <td>RSW</td>
+      <td>1451.0</td>
+      <td>1447.0</td>
+      <td>-4.0</td>
+      <td>23.0</td>
+      <td>5.0</td>
+      <td>1636.0</td>
+      <td>1656.0</td>
+      <td>20.0</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>105.0</td>
+      <td>129.0</td>
+      <td>101.0</td>
+      <td>515.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2009</td>
+      <td>1</td>
+      <td>13</td>
+      <td>2</td>
+      <td>DL</td>
+      <td>N3752</td>
+      <td>1239</td>
+      <td>SLC</td>
+      <td>PDX</td>
+      <td>2020.0</td>
+      <td>2027.0</td>
+      <td>7.0</td>
+      <td>17.0</td>
+      <td>5.0</td>
+      <td>2127.0</td>
+      <td>2127.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>127.0</td>
+      <td>120.0</td>
+      <td>98.0</td>
+      <td>630.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2009</td>
+      <td>1</td>
+      <td>13</td>
+      <td>2</td>
+      <td>DL</td>
+      <td>N913DN</td>
+      <td>1240</td>
+      <td>SLC</td>
+      <td>ORD</td>
+      <td>1055.0</td>
+      <td>1052.0</td>
+      <td>-3.0</td>
+      <td>25.0</td>
+      <td>16.0</td>
+      <td>1523.0</td>
+      <td>1507.0</td>
+      <td>-16.0</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>208.0</td>
+      <td>195.0</td>
+      <td>154.0</td>
+      <td>1249.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2009</td>
+      <td>1</td>
+      <td>13</td>
+      <td>2</td>
+      <td>DL</td>
+      <td>N915DN</td>
+      <td>1241</td>
+      <td>DTW</td>
+      <td>SLC</td>
+      <td>1640.0</td>
+      <td>1638.0</td>
+      <td>-2.0</td>
+      <td>13.0</td>
+      <td>4.0</td>
+      <td>1843.0</td>
+      <td>1833.0</td>
+      <td>-10.0</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>243.0</td>
+      <td>235.0</td>
+      <td>218.0</td>
+      <td>1481.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2009</td>
+      <td>1</td>
+      <td>13</td>
+      <td>2</td>
+      <td>DL</td>
+      <td>N915DN</td>
+      <td>1242</td>
+      <td>BOI</td>
+      <td>SLC</td>
+      <td>755.0</td>
+      <td>749.0</td>
+      <td>-6.0</td>
+      <td>18.0</td>
+      <td>6.0</td>
+      <td>907.0</td>
+      <td>903.0</td>
+      <td>-4.0</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>72.0</td>
+      <td>74.0</td>
+      <td>50.0</td>
+      <td>291.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 54383096 entries, 0 to 54383095
+Data columns (total 29 columns):
+year                   int64
+month                  int64
+day_of_month           int64
+day_of_week            int64
+unique_carrier         object
+tail_num               object
+fl_num                 int64
+origin                 object
+dest                   object
+crs_dep_time           float64
+dep_time               float64
+dep_delay              float64
+taxi_out               float64
+taxi_in                float64
+crs_arr_time           float64
+arr_time               float64
+arr_delay              float64
+cancelled              float64
+cancellation_code      object
+diverted               float64
+crs_elapsed_time       float64
+actual_elapsed_time    float64
+air_time               float64
+distance               float64
+carrier_delay          float64
+weather_delay          float64
+nas_delay              float64
+security_delay         float64
+late_aircraft_delay    float64
+dtypes: float64(19), int64(5), object(5)
+memory usage: 11.8+ GB
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <ul>
-<li><a href="https://drive.google.com/open?id=15U1loH4gTsSkWUpbxGPWWKsA19OOA6wA">Click here</a> to download the tableau workbook labeled <em>flights2019-2017</em></li>
-<li>Then <a href="https://www.tableau.com/products/reader">click here</a> to download the free tableau reader</li>
-<li>Open Tableau Reader then open the workbook</li>
-</ul>
-<h3 id="Rescources">Rescources<a class="anchor-link" href="#Rescources">&#182;</a></h3><ul>
-<li><a href="https://www.tableau.com/">Tableau</a></li>
-<li>Python - <em>pandas</em></li>
-<li><a href="https://jupyterlab.readthedocs.io/en/stable/getting_started/overview.html">Jupyter Lab</a></li>
-<li><a href="https://www.transtats.bts.gov">The Bureau of Transportation Statistics</a></li>
-<li><a href="https://www.transtats.bts.gov/Fields.asp?table_id=236">Data Description</a></li>
-<li><a href="https://github.com/kennethacurtis/flight_delay_analysis">Github</a></li>
+<li>combine <code>year</code>, <code>month</code>, <code>day-of-month</code>, and <code>day_of_week</code> into one column in DateTime format</li>
+<li>turn <code>fl_num</code> into string</li>
+<li><code>crs_arr_time</code>, and <code>arrtime</code> are in hhmm format, change it to standard time</li>
+<li><code>cancelled</code> to bool, 1 = True, 0 = False</li>
+<li><code>cancellation_code</code> has values of NaN, A, B, C, and D. Each needs to be changed.</li>
+<li><code>diverted</code> to bool, 1 = True, 0 = False</li>
 </ul>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Clean">Clean<a class="anchor-link" href="#Clean">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Define">Define<a class="anchor-link" href="#Define">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Drop <code>day_of_week</code>, <code>tail_num</code> columns, they are not needed</li>
+<li>To change <code>crs_dep_time</code>, <code>dep_time</code>, <code>crs_arr_time</code>, and <code>arr_time</code> to a standard time format, we need to turn them into integers, then into a different format.<ul>
+<li>turn into int</li>
+<li>then turn string</li>
+<li>use <code>year</code>, <code>month</code>, <code>day_of_month</code> to do below steps</li>
+<li>use <code>datetime.datetime.strptime('orginal_format', '%H:%M').strftime('%I:%M %p')</code></li>
+<li>then <code>df['datetime'] = df['year'].map(str) + ' ' + df['month'].map(str) + ' ' + df['day_of_month'].map(str) + ' ' + df['crs_arr_time'].map(str)</code></li>
+<li>if there are errors, drop the row</li>
+<li>drop <code>year</code>, <code>month</code>, <code>day_of_month</code>, <code>crs_dep_time</code>, <code>dep_time</code>, <code>crs_arr_time</code>, and <code>arr_time</code>, these columns will be combined into 4 datetime columns</li>
+</ul>
+</li>
+<li>drop all flights that were cancelled<ul>
+<li>where <code>cancelled</code> = 1.0</li>
+<li>drop row</li>
+</ul>
+</li>
+<li>drop all flights that were diverted<ul>
+<li>where <code>diverted</code> = 1.0</li>
+<li>drop row</li>
+</ul>
+</li>
+<li>combine delay columns into one column<ul>
+<li>combine <code>carrier_delay</code>, <code>nas_delay</code>, <code>weather_delay</code>, <code>security_delay</code>, and <code>late_aircraft_delay</code><ul>
+<li>create a column that holds the value 0.0</li>
+<li>loop through the above columns, if column, row, has value, add to created column</li>
+<li>if no value, continue loop</li>
+<li>create similar loop that creates a "label" column</li>
+</ul>
+</li>
+<li>drop above columns</li>
+</ul>
+</li>
+<li><code>diverted</code> to bool, 1 = True, 0 = False<ul>
+<li>use <code>df[column] = df[column].replace(replacements_dict)</code></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Code">Code<a class="anchor-link" href="#Code">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop day_of_week</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;day_of_week&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop tail_num</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;tail_num&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop flights that were cancelled</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">cancelled</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop cancelled row</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;cancelled&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop flights that were diverted</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">diverted</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop diverted row</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;diverted&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop outliers with missing data</span>
+<span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">,</span> <span class="s1">&#39;taxi_in&#39;</span><span class="p">,</span> <span class="s1">&#39;crs_arr_time&#39;</span><span class="p">,</span> <span class="s1">&#39;arr_time&#39;</span><span class="p">,</span> 
+                       <span class="s1">&#39;arr_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;crs_elapsed_time&#39;</span><span class="p">,</span> <span class="s1">&#39;actual_elapsed_time&#39;</span><span class="p">,</span> 
+                       <span class="s1">&#39;air_time&#39;</span><span class="p">],</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># turn crs_arr_time, arr_time, crs_dep_time, dep_time to int</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># now turn them into strings</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># turn columns into standard time format</span>
+<span class="k">def</span> <span class="nf">std_time</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="s1">&#39;%H%M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%I:%M%p&#39;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">dep_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">crs_arr_errors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">std_time</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;there were </span><span class="si">%s</span><span class="s1"> errors&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">crs_arr_errors</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>there were 105688 errors
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop rows that had errors in time conversion</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">crs_arr_errors</span><span class="p">)]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">arr_errors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">std_time</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;there were </span><span class="si">%s</span><span class="s1"> errors&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr_errors</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>there were 0 errors
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># to csv to save memory</span>
+<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_1.csv&#39;</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_1.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">crs_dep_errors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">std_time</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;there were </span><span class="si">%s</span><span class="s1"> errors&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">crs_dep_errors</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>there were 4063 errors
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">crs_dep_errors</span><span class="p">)]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#to csv to save memory</span>
+<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_2.csv&#39;</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_2.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dep_errors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">std_time</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;there were </span><span class="si">%s</span><span class="s1"> errors&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">dep_errors</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>there were 35232 errors
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">dep_errors</span><span class="p">)]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># combine values from year, month, day_of_month, and time column</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_crs_arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;day_of_month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;day_of_month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_time&#39;</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_crs_dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;day_of_month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;day_of_month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_time&#39;</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_3.csv&#39;</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_3.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># turn columns into datetime</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_crs_arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_crs_arr_time&#39;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_arr_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_arr_time&#39;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_crs_dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_crs_dep_time&#39;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_dep_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime_dep_time&#39;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># to csv to save memory</span>
+<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_4.csv&#39;</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_4.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop year, month, day_of_month, crs_dep_time, dep_time, crs_arr_time, cancellation_code, and arr_delay</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;day_of_month&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;crs_dep_time&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;dep_time&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;crs_arr_time&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;arr_time&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;cancellation_code&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># fill nan values in the delay columns with zero&#39;s</span>
+<span class="n">df</span><span class="p">[[</span><span class="s1">&#39;carrier_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;weather_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;nas_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;security_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;late_aircraft_delay&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;carrier_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;weather_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;nas_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;security_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;late_aircraft_delay&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># combine delay columns into one label column</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;carrier_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;weather_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;nas_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;security_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;late_aircraft_delay&#39;</span><span class="p">]</span>
+
+<span class="c1"># make a new no delay column</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;delay_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;no_delay&#39;</span>
+
+<span class="c1"># loop through columns, if all are 0, move on</span>
+<span class="c1"># if not, set cell to delay label</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;delay_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;delay_amount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="c1"># loop through columns, if all are 0, move on</span>
+<span class="c1"># if not, set cell to the original column/cell value</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;delay_amount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_5.csv&#39;</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;clean_df_5.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop carrier_delay, weather_delay, nas_delay, security_delay, and late_aircraft_delay</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;carrier_delay&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;weather_delay&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;nas_delay&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;security_delay&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;late_aircraft_delay&#39;</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop rows that have missing data in the time columns</span>
+<span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;datetime_crs_arr_time&#39;</span><span class="p">,</span> <span class="s1">&#39;datetime_arr_time&#39;</span><span class="p">,</span> <span class="s1">&#39;datetime_crs_dep_time&#39;</span><span class="p">,</span> <span class="s1">&#39;datetime_dep_time&#39;</span><span class="p">],</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># turn float columns to int</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_delay&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dep_delay&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;taxi_out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;taxi_out&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;taxi_in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;taxi_in&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_delay&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;arr_delay&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_elapsed_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;crs_elapsed_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;actual_elapsed_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;actual_elapsed_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;air_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;air_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;delay_amount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;delay_amount&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Test">Test<a class="anchor-link" href="#Test">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[27]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>unique_carrier</th>
+      <th>fl_num</th>
+      <th>origin</th>
+      <th>dest</th>
+      <th>dep_delay</th>
+      <th>taxi_out</th>
+      <th>taxi_in</th>
+      <th>arr_delay</th>
+      <th>crs_elapsed_time</th>
+      <th>actual_elapsed_time</th>
+      <th>air_time</th>
+      <th>distance</th>
+      <th>datetime_crs_arr_time</th>
+      <th>datetime_arr_time</th>
+      <th>datetime_crs_dep_time</th>
+      <th>datetime_dep_time</th>
+      <th>delay_label</th>
+      <th>delay_amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>DL</td>
+      <td>1237</td>
+      <td>ATL</td>
+      <td>RSW</td>
+      <td>-4</td>
+      <td>23</td>
+      <td>5</td>
+      <td>20</td>
+      <td>105</td>
+      <td>129</td>
+      <td>101</td>
+      <td>515</td>
+      <td>2009-01-13 16:36:00</td>
+      <td>2009-01-13 16:56:00</td>
+      <td>2009-01-13 14:51:00</td>
+      <td>2009-01-13 14:47:00</td>
+      <td>nas_delay</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DL</td>
+      <td>1239</td>
+      <td>SLC</td>
+      <td>PDX</td>
+      <td>7</td>
+      <td>17</td>
+      <td>5</td>
+      <td>0</td>
+      <td>127</td>
+      <td>120</td>
+      <td>98</td>
+      <td>630</td>
+      <td>2009-01-13 21:27:00</td>
+      <td>2009-01-13 21:27:00</td>
+      <td>2009-01-13 20:20:00</td>
+      <td>2009-01-13 20:27:00</td>
+      <td>no_delay</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>DL</td>
+      <td>1240</td>
+      <td>SLC</td>
+      <td>ORD</td>
+      <td>-3</td>
+      <td>25</td>
+      <td>16</td>
+      <td>-16</td>
+      <td>208</td>
+      <td>195</td>
+      <td>154</td>
+      <td>1249</td>
+      <td>2009-01-13 15:23:00</td>
+      <td>2009-01-13 15:07:00</td>
+      <td>2009-01-13 10:55:00</td>
+      <td>2009-01-13 10:52:00</td>
+      <td>no_delay</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>DL</td>
+      <td>1241</td>
+      <td>DTW</td>
+      <td>SLC</td>
+      <td>-2</td>
+      <td>13</td>
+      <td>4</td>
+      <td>-10</td>
+      <td>243</td>
+      <td>235</td>
+      <td>218</td>
+      <td>1481</td>
+      <td>2009-01-13 18:43:00</td>
+      <td>2009-01-13 18:33:00</td>
+      <td>2009-01-13 16:40:00</td>
+      <td>2009-01-13 16:38:00</td>
+      <td>no_delay</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>DL</td>
+      <td>1242</td>
+      <td>BOI</td>
+      <td>SLC</td>
+      <td>-6</td>
+      <td>18</td>
+      <td>6</td>
+      <td>-4</td>
+      <td>72</td>
+      <td>74</td>
+      <td>50</td>
+      <td>291</td>
+      <td>2009-01-13 09:07:00</td>
+      <td>2009-01-13 09:03:00</td>
+      <td>2009-01-13 07:55:00</td>
+      <td>2009-01-13 07:49:00</td>
+      <td>no_delay</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>DL</td>
+      <td>1242</td>
+      <td>SLC</td>
+      <td>DTW</td>
+      <td>-6</td>
+      <td>27</td>
+      <td>10</td>
+      <td>-8</td>
+      <td>224</td>
+      <td>222</td>
+      <td>185</td>
+      <td>1481</td>
+      <td>2009-01-13 15:44:00</td>
+      <td>2009-01-13 15:36:00</td>
+      <td>2009-01-13 10:00:00</td>
+      <td>2009-01-13 09:54:00</td>
+      <td>no_delay</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>DL</td>
+      <td>1243</td>
+      <td>CVG</td>
+      <td>DEN</td>
+      <td>115</td>
+      <td>24</td>
+      <td>8</td>
+      <td>116</td>
+      <td>185</td>
+      <td>186</td>
+      <td>154</td>
+      <td>1069</td>
+      <td>2009-01-13 09:50:00</td>
+      <td>2009-01-13 11:46:00</td>
+      <td>2009-01-13 08:45:00</td>
+      <td>2009-01-13 10:40:00</td>
+      <td>nas_delay</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>DL</td>
+      <td>1248</td>
+      <td>MCO</td>
+      <td>CVG</td>
+      <td>-8</td>
+      <td>21</td>
+      <td>5</td>
+      <td>-16</td>
+      <td>138</td>
+      <td>130</td>
+      <td>104</td>
+      <td>756</td>
+      <td>2009-01-13 16:05:00</td>
+      <td>2009-01-13 15:49:00</td>
+      <td>2009-01-13 13:47:00</td>
+      <td>2009-01-13 13:39:00</td>
+      <td>no_delay</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>DL</td>
+      <td>1249</td>
+      <td>CVG</td>
+      <td>MCO</td>
+      <td>8</td>
+      <td>13</td>
+      <td>8</td>
+      <td>20</td>
+      <td>129</td>
+      <td>141</td>
+      <td>120</td>
+      <td>756</td>
+      <td>2009-01-13 16:14:00</td>
+      <td>2009-01-13 16:34:00</td>
+      <td>2009-01-13 14:05:00</td>
+      <td>2009-01-13 14:13:00</td>
+      <td>late_aircraft_delay</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>DL</td>
+      <td>1250</td>
+      <td>MCO</td>
+      <td>CVG</td>
+      <td>0</td>
+      <td>14</td>
+      <td>5</td>
+      <td>-10</td>
+      <td>130</td>
+      <td>120</td>
+      <td>101</td>
+      <td>756</td>
+      <td>2009-01-13 19:10:00</td>
+      <td>2009-01-13 19:00:00</td>
+      <td>2009-01-13 17:00:00</td>
+      <td>2009-01-13 17:00:00</td>
+      <td>no_delay</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[16]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>unique_carrier           0
+fl_num                   0
+origin                   0
+dest                     0
+dep_delay                0
+taxi_out                 0
+taxi_in                  0
+arr_delay                0
+crs_elapsed_time         0
+actual_elapsed_time      0
+air_time                 0
+distance                 0
+datetime_crs_arr_time    0
+datetime_arr_time        0
+datetime_crs_dep_time    0
+datetime_dep_time        0
+delay_label              0
+delay_amount             0
+dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Int64Index: 53068460 entries, 0 to 53396364
+Data columns (total 18 columns):
+unique_carrier           object
+fl_num                   int64
+origin                   object
+dest                     object
+dep_delay                int32
+taxi_out                 int32
+taxi_in                  int32
+arr_delay                int32
+crs_elapsed_time         int32
+actual_elapsed_time      int32
+air_time                 int32
+distance                 int32
+datetime_crs_arr_time    object
+datetime_arr_time        object
+datetime_crs_dep_time    object
+datetime_dep_time        object
+delay_label              object
+delay_amount             int32
+dtypes: int32(9), int64(1), object(8)
+memory usage: 5.7+ GB
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># clean dataset to master csv file</span>
+<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;flights_master.csv&#39;</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
 </div>
     </div>
   </div>
