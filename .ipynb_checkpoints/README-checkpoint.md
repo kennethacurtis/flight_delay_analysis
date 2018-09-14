@@ -4,7 +4,7 @@
 
 The visualizations for the project were created in Tableau. For me to share the project with others on Tableau Public, the data had to be filtered by just one year, 2017. As you will see in my gathering process, I originally gathered data from 2009 to 2017 which resulted in well over 15 million rows of data, which is the limit for Tableau Public. Because of this I have provided two ways to view the project.
 
-**To view the project for flight data in 2017 on tableau public:** [click here](https://public.tableau.com/profile/kenneth5709#!/vizhome/FlightDelayAnalysis_16/FlightsStory)
+**To view the project for flight data in 2017 on tableau public:** [click here]()
 
 **To view the project for flight data from 2009-2017:**
 * [Click here](https://drive.google.com/open?id=15U1loH4gTsSkWUpbxGPWWKsA19OOA6wA) to download the tableau workbook labeled *flights2019-2017*
