@@ -11,6 +11,9 @@ The visualizations for the project were created in Tableau. For me to share the 
 * Then [click here](https://www.tableau.com/products/reader) to download the free tableau reader
 * Open Tableau Reader then open the workbook
 
+**To read the report on cleaning this data:**
+[Click here](https://kennethacurtis.github.io/flight_delay_analysis/)
+
 ### Introduction
 
 This data comes from [The Bureau of Transportation Statistics](https://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=) and tracks destinations, distance, and delay information of flights across U.S. For this project, I chose the years 2009 through 2017 resulting in 54,383,096 rows of data. To see a more detailed description of the date, click [here](https://www.transtats.bts.gov/Fields.asp?table_id=236).
